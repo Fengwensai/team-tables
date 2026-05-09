@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>团队表格导航站 - GitHub Pages 同步版</title>
+    <style>
+        /* 此处样式与之前完全相同，为节省篇幅，直接复用前面完整样式 */
+        /* 请确保样式块完整，以下为精简但可用的版本（功能一致） */
+        *{box-sizing:border-box;margin:0;padding:0;}
+        body{font-family:system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;background:#f4f7fb;padding:20px;color:#1e2a3e;}
+        .container{max-width:1400px;margin:0 auto;}
+        .header{margin-bottom:24px;text-align:center;}
+        h1{font-size:1.8rem;font-weight:600;color:#0f3b5c;margin-bottom:8px;}
+        .sub{color:#5b7a9a;margin-bottom:24px;}
+        .toolbar{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:28px;justify-content:space-between;align-items:center;background:white;padding:12px 20px;border-radius:40px;box-shadow:0 2px 6px rgba(0,0,0,0.05);}
+        .search-box{flex:2;min-width:200px;display:flex;align-items:center;background:#f0f2f5;border-radius:32px;padding:0 16px;}
+        .search-box input{width:100%;padding:12px 8px;border:none;background:transparent;font-size:1rem;outline:none;}
+        .search-box span{color:#8ba0b5;}
+        .filter-group{display:flex;gap:8px;flex-wrap:wrap;}
+        .filter-btn{background:#e9ecef;border:none;padding:8px 16px;border-radius:32px;cursor:pointer;font-size:0.85rem;transition:all 0.2s;}
+        .filter-btn.active{background:#2c7da0;color:white;}
+        .project-section{margin-bottom:32px;background:white;border-radius:20px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.05);}
+        .project-title{background:#eef2f7;padding:16px 24px;font-size:1.3rem;font-weight:600;border-left:5px solid #2c7da0;cursor:pointer;user-select:none;display:flex;justify-content:space-between;align-items:center;}
+        .project-title:hover{background:#e2e8f0;}
+        .badge{background:#cbd5e1;padding:4px 12px;border-radius:20px;font-size:0.8rem;font-weight:normal;}
+        .table-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));gap:16px;padding:20px 24px;transition:all 0.2s;}
+        .table-card{background:#ffffff;border-radius:16px;border:1px solid #e2edf2;padding:16px;transition:all 0.2s;box-shadow:0 1px 2px rgba(0,0,0,0.03);}
+        .table-card:hover{transform:translateY(-3px);box-shadow:0 12px 20px -12px rgba(0,0,0,0.15);border-color:#bdd9e7;}
+        .card-header{display:flex;justify-content:space-between;align-items:start;margin-bottom:10px;}
+        .table-name{font-weight:600;font-size:1.05rem;color:#0f3b5c;word-break:break-word;}
+        .favorite{background:none;border:none;font-size:1.3rem;cursor:pointer;color:#cbd5e1;transition:0.1s;}
+        .favorite.active{color:#f5b042;}
+        .table-desc{font-size:0.8rem;color:#5f7f9e;margin:8px 0;line-height:1.4;}
+        .table-meta{display:flex;justify-content:space-between;align-items:center;margin-top:12px;font-size:0.7rem;color:#7f9cbb;}
+        .open-btn{background:#1f6392;color:white;border:none;padding:6px 14px;border-radius:24px;cursor:pointer;font-size:0.75rem;text-decoration:none;display:inline-block;transition:background 0.2s;font-family:inherit;}
+        .open-btn:hover{background:#0e4a6f;}
+        .empty-msg{grid-column:1/-1;text-align:center;padding:40px;color:#8ba0b5;}
+        .admin-btn{position:fixed;bottom:24px;right:24px;background:#2c3e50;color:white;border:none;width:48px;height:48px;border-radius:50%;font-size:24px;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.2);display:flex;align-items:center;justify-content:center;transition:0.2s;z-index:100;}
+        .admin-btn:hover{background:#1e2a36;transform:scale(1.05);}
+        .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center;}
+        .modal-content{background:white;max-width:800px;width:90%;max-height:85vh;border-radius:28px;padding:24px;overflow-y:auto;box-shadow:0 20px 30px rgba(0,0,0,0.2);}
+        .modal-content h2{margin-bottom:16px;}
+        .table-list-admin{margin:20px 0;max-height:50vh;overflow-y:auto;}
+        .admin-table-item{background:#f8fafc;border-radius:16px;padding:12px;margin-bottom:12px;border:1px solid #e2edf2;}
+        .admin-table-item input,.admin-table-item textarea{width:100%;padding:8px;margin:4px 0;border:1px solid #cbd5e1;border-radius:12px;font-family:inherit;}
+        .admin-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:8px;}
+        button{background:#e9ecef;border:none;padding:6px 12px;border-radius:20px;cursor:pointer;}
+        button.primary{background:#2c7da0;color:white;}
+        button.danger{background:#e76f51;color:white;}
+        .config-btns{display:flex;gap:12px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap;}
+        .path-hint{display:block;color:#6c8fb0;font-size:11px;margin-top:2px;}
+        footer{text-align:center;margin-top:40px;font-size:0.75rem;color:#8ba0b5;}
+        @media (max-width:700px){.toolbar{flex-direction:column;align-items:stretch;}.project-title{font-size:1.1rem;}}
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>📋 团队表格导航站</h1>
+        <div class="sub">GitHub Pages 自动同步 · 支持本地文件路径</div>
+    </div>
+    <div class="toolbar">
+        <div class="search-box">
+            <span>🔍</span>
+            <input type="text" id="searchInput" placeholder="搜索表格名称、项目或描述...">
+        </div>
+        <div class="filter-group" id="projectFilter"></div>
+    </div>
+    <div id="app">正在加载配置...</div>
+    <footer>提示：配置由管理员在 GitHub 仓库中维护，每次推送自动更新，刷新页面即可获取最新表格列表。<br>本地文件路径格式：C:\文件夹\文件.xlsx，点击按钮复制路径后按 Win+R 打开。</footer>
+</div>
+<button class="admin-btn" id="adminBtn">⚙️</button>
+
+<!-- 密码模态框（个人本地修改） -->
+<div id="passwordModal" class="modal">
+    <div class="modal-content" style="max-width:400px;">
+        <h2>管理员验证</h2>
+        <input type="password" id="adminPassword" placeholder="请输入管理密码" style="width:100%; padding:12px; margin:16px 0; border-radius:32px; border:1px solid #ccc;">
+        <div style="display:flex; gap:12px; justify-content:flex-end;">
+            <button id="cancelPwdBtn">取消</button>
+            <button id="submitPwdBtn" class="primary">确认</button>
+        </div>
+    </div>
+</div>
+
+<!-- 管理模态框（个人临时修改） -->
+<div id="adminModal" class="modal">
+    <div class="modal-content">
+        <h2>📋 本地临时修改（仅供个人使用）</h2>
+        <p style="font-size:0.8rem; color:#666;">⚠️ 此处修改仅保存在您自己的浏览器中，不影响团队成员。如需永久更改表格列表，请联系管理员修改 GitHub 仓库中的 tables.json 文件。</p>
+        <div id="adminTableList" class="table-list-admin"></div>
+        <button id="addTableBtn" class="primary" style="margin:8px 0;">+ 新增表格（本地）</button>
+        <div class="config-btns">
+            <button id="saveLocalConfigBtn">💾 保存到本地（个人）</button>
+            <button id="closeAdminBtn">关闭</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ======================= 远程配置地址（请修改为你的 GitHub Pages 地址） =======================
+    const REMOTE_CONFIG_URL = "https://github.com/Fengwensai/team-tables/blob/7fdbef8daf2658ee66d24c4b6e04b5f37a84ae70/tables.json";  // ⚠️ 必须修改
+    
+    // 默认表格（仅当远程和本地缓存都无数据时使用）
+    const DEFAULT_TABLES = [
+        { id: 1, project: "示例项目", name: "欢迎使用", url: "https://github.com", description: "请管理员替换配置" }
+    ];
+    
+    const ADMIN_PASSWORD = "admin123";
+    
+    // ======================= 全局变量 =======================
+    let tableData = [];
+    let favorites = new Set();
+    let currentSearch = "";
+    let currentProject = "全部";
+    let isAdminAuthenticated = false;
+    
+    // ---------- 工具函数 ----------
+    function escapeHtml(str) {
+        if(!str) return "";
+        return str.replace(/[&<>]/g, function(m) {
+            if(m === '&') return '&amp;';
+            if(m === '<') return '&lt;';
+            if(m === '>') return '&gt;';
+            return m;
+        });
+    }
+    
+    function isLocalPath(url) {
+        if (!url) return false;
+        return url.startsWith('file://') || url.startsWith('\\\\') || /^[a-zA-Z]:\\/.test(url);
+    }
+    
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(() => {}).catch(() => {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+        });
+    }
+    
+    function openLocalFile(path) {
+        let copyPath = path;
+        if (path.startsWith('file:///')) {
+            copyPath = decodeURIComponent(path.substring(8)).replace(/\//g, '\\');
+        }
+        copyToClipboard(copyPath);
+        alert(`本地文件路径已复制！\n\n${copyPath}\n\n请按 Win + R，然后粘贴（Ctrl+V）并回车，即可用默认程序打开。`);
+    }
+    
+    // ---------- 收藏功能 ----------
+    function loadFavorites() {
+        const stored = localStorage.getItem("table_nav_favorites");
+        if(stored) {
+            try {
+                let arr = JSON.parse(stored);
+                favorites = new Set(arr);
+            } catch(e) {}
+        }
+    }
+    function saveFavorites() {
+        localStorage.setItem("table_nav_favorites", JSON.stringify([...favorites]));
+    }
+    function toggleFavorite(id) {
+        if(favorites.has(id)) favorites.delete(id);
+        else favorites.add(id);
+        saveFavorites();
+        renderApp();
+    }
+    
+    // ---------- 数据加载（核心：从 GitHub Pages 远程拉取） ----------
+    async function loadTableData() {
+        // 尝试从远程拉取最新配置
+        try {
+            const response = await fetch(REMOTE_CONFIG_URL, { cache: "no-cache" });
+            if (response.ok) {
+                const remoteData = await response.json();
+                if (Array.isArray(remoteData) && remoteData.length > 0) {
+                    tableData = remoteData;
+                    // 同步到 localStorage 作为缓存
+                    localStorage.setItem("table_nav_data", JSON.stringify(tableData));
+                    console.log("成功从 GitHub Pages 加载配置");
+                    return;
+                } else {
+                    console.warn("远程数据格式错误或为空");
+                }
+            } else {
+                console.warn("远程拉取失败，HTTP状态:", response.status);
+            }
+        } catch (e) {
+            console.warn("远程拉取异常，将使用本地缓存", e);
+        }
+        
+        // 降级：从 localStorage 读取缓存
+        const stored = localStorage.getItem("table_nav_data");
+        if (stored) {
+            try {
+                tableData = JSON.parse(stored);
+                console.log("从本地缓存加载配置");
+                return;
+            } catch(e) {}
+        }
+        
+        // 最终降级：使用默认数据
+        tableData = JSON.parse(JSON.stringify(DEFAULT_TABLES));
+        console.log("使用默认配置");
+    }
+    
+    function saveTableDataToLocal() {
+        localStorage.setItem("table_nav_data", JSON.stringify(tableData));
+    }
+    
+    function getAllProjects() {
+        let projects = [...new Set(tableData.map(item => item.project))];
+        return projects.sort();
+    }
+    
+    function renderApp() {
+        let filtered = tableData.filter(item => {
+            if(currentProject !== "全部" && item.project !== currentProject) return false;
+            if(currentSearch.trim() !== "") {
+                const kw = currentSearch.trim().toLowerCase();
+                return item.name.toLowerCase().includes(kw) || 
+                       item.project.toLowerCase().includes(kw) ||
+                       (item.description && item.description.toLowerCase().includes(kw));
+            }
+            return true;
+        });
+        
+        const container = document.getElementById("app");
+        if(!container) return;
+        if(filtered.length === 0) {
+            container.innerHTML = `<div class="empty-msg">😔 没有找到相关表格，试试其他关键词吧</div>`;
+            return;
+        }
+        
+        const projects = currentProject === "全部" ? getAllProjects() : [currentProject];
+        let html = "";
+        for(let proj of projects) {
+            const tablesInProj = filtered.filter(t => t.project === proj);
+            if(tablesInProj.length === 0) continue;
+            const sectionId = `proj-${proj.replace(/[^a-zA-Z0-9]/g, '')}`;
+            html += `
+                <div class="project-section">
+                    <div class="project-title" onclick="toggleProject('${sectionId}')">
+                        <span>📁 ${escapeHtml(proj)}</span>
+                        <span class="badge">${tablesInProj.length}个表格</span>
+                    </div>
+                    <div id="${sectionId}" class="table-grid">
+            `;
+            for(let table of tablesInProj) {
+                const isFav = favorites.has(table.id);
+                const local = isLocalPath(table.url);
+                html += `
+                    <div class="table-card">
+                        <div class="card-header">
+                            <div class="table-name">📄 ${escapeHtml(table.name)}</div>
+                            <button class="favorite ${isFav ? 'active' : ''}" onclick="toggleFavorite(${table.id})">${isFav ? '❤️' : '🤍'}</button>
+                        </div>
+                        ${table.description ? `<div class="table-desc">${escapeHtml(table.description)}</div>` : ''}
+                        <div class="table-meta">
+                            <span>${local ? '📁 本地文件' : '🌐 在线文档'}</span>
+                            ${local ? 
+                                `<button class="open-btn" onclick="openLocalFile('${escapeHtml(table.url).replace(/\\/g, '\\\\')}')">📂 打开本地文件</button>` :
+                                `<a href="${escapeHtml(table.url)}" target="_blank" class="open-btn" rel="noopener noreferrer">打开表格 →</a>`
+                            }
+                        </div>
+                    </div>
+                `;
+            }
+            html += `</div></div>`;
+        }
+        container.innerHTML = html;
+    }
+    
+    function toggleProject(sectionId) {
+        const el = document.getElementById(sectionId);
+        if(el) el.style.display = el.style.display === 'none' ? 'grid' : 'none';
+    }
+    
+    function renderFilterButtons() {
+        const projects = getAllProjects();
+        const filterDiv = document.getElementById("projectFilter");
+        if(!filterDiv) return;
+        let btns = `<button class="filter-btn ${currentProject === '全部' ? 'active' : ''}" data-proj="全部">🗂️ 全部</button>`;
+        projects.forEach(proj => {
+            btns += `<button class="filter-btn ${currentProject === proj ? 'active' : ''}" data-proj="${escapeHtml(proj)}">📌 ${escapeHtml(proj)}</button>`;
+        });
+        filterDiv.innerHTML = btns;
+        document.querySelectorAll("#projectFilter .filter-btn").forEach(btn => {
+            btn.addEventListener("click", (e) => {
+                currentProject = btn.getAttribute("data-proj");
+                renderFilterButtons();
+                renderApp();
+            });
+        });
+    }
+    
+    function bindSearch() {
+        const input = document.getElementById("searchInput");
+        if(input) {
+            input.addEventListener("input", (e) => {
+                currentSearch = e.target.value;
+                renderApp();
+            });
+        }
+    }
+    
+    // ======================= 管理面板逻辑（个人本地修改） =======================
+    let adminModal = document.getElementById("adminModal");
+    let passwordModal = document.getElementById("passwordModal");
+    
+    function showPasswordModal() {
+        passwordModal.style.display = "flex";
+        document.getElementById("adminPassword").value = "";
+    }
+    function hidePasswordModal() { passwordModal.style.display = "none"; }
+    function hideAdminModal() { adminModal.style.display = "none"; }
+    
+    function renderAdminTableList() {
+        const container = document.getElementById("adminTableList");
+        if(!container) return;
+        if(tableData.length === 0) {
+            container.innerHTML = "<p>暂无表格，点击上方新增</p>";
+            return;
+        }
+        let html = "";
+        tableData.forEach((table, idx) => {
+            html += `
+                <div class="admin-table-item" data-idx="${idx}">
+                    <input type="text" placeholder="项目名称" value="${escapeHtml(table.project)}" class="admin-project" data-idx="${idx}">
+                    <input type="text" placeholder="表格名称" value="${escapeHtml(table.name)}" class="admin-name" data-idx="${idx}">
+                    <input type="text" placeholder="表格链接 (URL或本地路径)" value="${escapeHtml(table.url)}" class="admin-url" data-idx="${idx}">
+                    <span class="path-hint">支持 http://、https://、C:\文件夹\文件.xlsx 或 \\server\share\文件.xls</span>
+                    <textarea placeholder="描述" rows="2" class="admin-desc" data-idx="${idx}">${escapeHtml(table.description || '')}</textarea>
+                    <div class="admin-actions">
+                        <button class="danger delete-row" data-idx="${idx}">删除</button>
+                    </div>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+        // 实时更新 tableData（仅内存）
+        document.querySelectorAll(".admin-project").forEach(el => {
+            el.addEventListener("change", (e) => { let idx = parseInt(el.dataset.idx); tableData[idx].project = el.value; });
+        });
+        document.querySelectorAll(".admin-name").forEach(el => {
+            el.addEventListener("change", (e) => { let idx = parseInt(el.dataset.idx); tableData[idx].name = el.value; });
+        });
+        document.querySelectorAll(".admin-url").forEach(el => {
+            el.addEventListener("change", (e) => { let idx = parseInt(el.dataset.idx); tableData[idx].url = el.value; });
+        });
+        document.querySelectorAll(".admin-desc").forEach(el => {
+            el.addEventListener("change", (e) => { let idx = parseInt(el.dataset.idx); tableData[idx].description = el.value; });
+        });
+        document.querySelectorAll(".delete-row").forEach(btn => {
+            btn.addEventListener("click", (e) => {
+                let idx = parseInt(btn.dataset.idx);
+                tableData.splice(idx, 1);
+                renderAdminTableList();
+            });
+        });
+    }
+    
+    function addNewTable() {
+        let newId = Math.max(...tableData.map(t => t.id), 0) + 1;
+        tableData.push({
+            id: newId,
+            project: "新项目",
+            name: "新表格",
+            url: "C:\\新文件路径.xlsx",
+            description: "请修改为实际本地路径或在线链接"
+        });
+        renderAdminTableList();
+    }
+    
+    function saveLocalConfig() {
+        saveTableDataToLocal();
+        renderFilterButtons();
+        renderApp();
+        hideAdminModal();
+        alert("已保存到本地缓存（个人）。注意：这不会影响团队其他成员，管理员更新远程配置后会被覆盖。");
+    }
+    
+    document.getElementById("adminBtn").addEventListener("click", () => {
+        if(isAdminAuthenticated) {
+            renderAdminTableList();
+            adminModal.style.display = "flex";
+        } else {
+            showPasswordModal();
+        }
+    });
+    document.getElementById("submitPwdBtn").addEventListener("click", () => {
+        const pwd = document.getElementById("adminPassword").value;
+        if(pwd === ADMIN_PASSWORD) {
+            isAdminAuthenticated = true;
+            hidePasswordModal();
+            renderAdminTableList();
+            adminModal.style.display = "flex";
+        } else {
+            alert("密码错误");
+        }
+    });
+    document.getElementById("cancelPwdBtn").addEventListener("click", hidePasswordModal);
+    document.getElementById("closeAdminBtn").addEventListener("click", hideAdminModal);
+    document.getElementById("addTableBtn").addEventListener("click", addNewTable);
+    document.getElementById("saveLocalConfigBtn").addEventListener("click", saveLocalConfig);
+    
+    window.onclick = function(e) {
+        if(e.target === passwordModal) hidePasswordModal();
+        if(e.target === adminModal) hideAdminModal();
+    };
+    
+    // ======================= 初始化 =======================
+    (async function init() {
+        await loadTableData();
+        loadFavorites();
+        renderFilterButtons();
+        bindSearch();
+        renderApp();
+    })();
+</script>
+</body>
+</html>
