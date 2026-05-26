@@ -12,5 +12,25 @@
     "name": "每日标注统计表",
     "url": "https://www.kdocs.cn/l/cloirl6nRwBx",
     "description": "各标注人员每日进度填报"
+  },
+  {
+    "id": 3,
+    "project": "3D分割项目",
+    "name": "每日统计表",
+    "url": "https://www.kdocs.cn/l/cnwMW8QEbv2d",
+    "description": "各标注人员每日进度填报"
+  },
+  {
+    "id": 4,
+    "project": "视频快判项目",
+    "name": "每日标注统计表",
+    "url": "https://www.kdocs.cn/l/cmAfhCCTDwo5",
+    "description": "各标注人员每日进度填报"
+  },{
+    "id": 5,
+    "project": "2D/3D项目",
+    "name": "每日标注统计表",
+    "url": "https://www.kdocs.cn/l/cdo0WxnkgxYH",
+    "description": "各标注人员每日进度填报"
   }
 ]
