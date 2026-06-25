@@ -21,7 +21,7 @@
   },
   {
     "id": 3,
-    "project": "3D分割项目",
+    "project": "整数-3D分割项目",
     "name": "每日统计表",
     "url": "https://www.kdocs.cn/l/cnwMW8QEbv2d",
     "description": "各标注人员每日进度填报"
@@ -62,5 +62,11 @@
     "name": "每日质检统计表",
     "url": "https://www.kdocs.cn/l/ceLCoZduDPpd",
     "description": "各质检人员每日进度填报"
-  }
+  }，{
+    "id": 10,
+    "project": "海天-3D分割项目",
+    "name": "每日统计表",
+    "url": "https://www.kdocs.cn/l/ceGINw36WP6U",
+    "description": "各标注、质检人员每日进度填报"
+  },
 ]
