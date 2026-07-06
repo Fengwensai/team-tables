@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Farewell</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      color: #e2e8f0;
+    }
+
+    .card {
+      max-width: 560px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 24px;
+      padding: 56px 40px 48px;
+      text-align: center;
+      animation: fadeIn 1.2s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .icon {
+      font-size: 64px;
+      margin-bottom: 24px;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%   { transform: translateY(0); }
+      50%  { transform: translateY(-8px); }
+      100% { transform: translateY(0); }
+    }
+
+    h1 {
+      font-size: 36px;
+      font-weight: 600;
+      color: #ffffff;
+      margin-bottom: 16px;
+      letter-spacing: -0.5px;
+    }
+
+    p {
+      font-size: 16px;
+      line-height: 1.8;
+      color: #94a3b8;
+      margin-bottom: 8px;
+    }
+
+    .divider {
+      width: 48px;
+      height: 2px;
+      background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+      margin: 28px auto;
+      border-radius: 2px;
+    }
+
+    .message {
+      font-size: 15px;
+      line-height: 1.8;
+      color: #cbd5e1;
+      margin-bottom: 32px;
+    }
+
+    .footer-text {
+      font-size: 13px;
+      color: #64748b;
+    }
+
+    @media (max-width: 480px) {
+      .card { padding: 40px 24px 36px; }
+      h1 { font-size: 28px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon">👋</div>
+    <h1>Goodbye, and thank you.</h1>
+    <div class="divider"></div>
+    <div class="message">
+      It's been an incredible journey. Thank you for all the<br>
+      laughs, the late-night pushes, and the unforgettable<br>
+      memories. Wishing you nothing but the best ahead.
+    </div>
+    <div class="footer-text">
+      — With love, from the team
+    </div>
+  </div>
+</body>
+</html>
